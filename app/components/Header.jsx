@@ -1,13 +1,35 @@
 "use client"
 import Image from 'next/image'
 import { useSession, signIn, signOut } from "next-auth/react"
-import React from 'react'
+import React, { useEffect } from 'react'
 import { HiSearch, HiBell, HiChat } from "react-icons/hi";
+import { doc, setDoc, getFirestore } from "firebase/firestore"; 
+import app from '../Shared/firebaseConfig'
+import { useRouter } from 'next/navigation';
 
 
 function Header() {
   const { data: session } = useSession()
+  const router = useRouter()
   console.log(session)
+  
+  const db = getFirestore(app)
+
+  useEffect(() => {
+    saveUserInfo()
+  }, [session])
+
+  const saveUserInfo = async () => {
+    if (session?.user) {
+      // Add a new document in collection "cities"
+      await setDoc(doc(db, "user", session.user.email), {
+        userName: session.user.name,
+        email: session.user.email,
+        userImage: session.user.image
+      });
+    }
+  };
+  
   return (
     <div className='flex gap-3 md:gap-2 items-center p-6'>
       <Image
@@ -37,6 +59,7 @@ function Header() {
         { session?.user? 
         <Image 
           src={session.user.image} 
+          onClick={() => router.push('/' + session.user.email)}
           alt="user-image" 
           width={50} 
           height={50} 
