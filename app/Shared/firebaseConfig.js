@@ -9,7 +9,7 @@ import { initializeApp } from "firebase/app";
 
 // console.log(api)
 const firebaseConfig = {
-  apiKey: "AIzaSyC1LjK_mqyrQ75wJldz8_Xk4J5hkeVRbpo",
+  apiKey: process.env.FIREBASE_API_KEY,
   authDomain: "image-gallery-b9a99.firebaseapp.com",
   projectId: "image-gallery-b9a99",
   storageBucket: "image-gallery-b9a99.appspot.com",
