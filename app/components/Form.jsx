@@ -17,12 +17,14 @@ function Form() {
   const [desc, setDesc] = useState()
   const [link, setLink] = useState()
   const [file, setFile] = useState()
+  const [loading, setLoading] = useState(false)
 
   const db = getFirestore()
   const postId = Date.now().toString()
-  
+  const router = useRouter()
   // Create a root reference
   const storage = getStorage(app)
+
   const uploadFile = () => {
     const storageRef = ref(storage, 'image-gallery/' + file.name)
     uploadBytes(storageRef, file)
@@ -39,11 +41,14 @@ function Form() {
           image:url,
           userName: session.user.name,
           email: session.user.email,
-          userImage: session.user.image
+          userImage: session.user.image,
+          id: postId
 
         }
         await setDoc(doc(db, 'image-gallery-post', postId), postData).then(resp => {
           console.log("saved")
+          router.push('/' + session.user.email)
+          setLoading(true)
         })
       });
     })
@@ -53,6 +58,7 @@ function Form() {
     console.log(title, desc, link)
     console.log(file)
     uploadFile()
+    setLoading(true)
   }
 
   return (
@@ -60,13 +66,14 @@ function Form() {
         <div className='flex justify-end mb-6'>
           <button onClick={()=>onSave()}
             className='bg-red-500 p-2 text-white font-semibold px-3 rounded-lg'>
+            { loading? 
             <Image src="/loading-indicator.png" 
               width={30} 
               height={30} 
               alt='loading'
               className='animate-spin'
-            />
-            <span>Save</span>
+            /> :
+            <span>Save</span>}  
           </button>
         </div>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-10'>           
